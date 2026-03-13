@@ -37,5 +37,10 @@ grep -r "tags:.*security" prompts/
 
 1. `prompts/` 에 `kebab-case.md` 파일 생성
 2. frontmatter 작성 (`title`, `tags`, `version`)
-3. `TAGS.md` 에 해당 태그 항목 추가
-4. Commit
+3. Commit — TAGS.md는 자동 재생성됨
+
+## 최초 셋업 (clone 후 1회)
+
+```bash
+git config core.hooksPath .githooks
+```
