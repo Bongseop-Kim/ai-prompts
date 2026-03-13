@@ -7,7 +7,11 @@
 ```
 ai-prompts/
 ├── prompts/        # 프롬프트 파일 (.md)
-├── TAGS.md         # 태그 인덱스
+├── scripts/
+│   └── gen-tags.py # TAGS.md 자동 생성 스크립트
+├── .githooks/
+│   └── pre-commit  # 커밋 시 TAGS.md 자동 재생성
+├── TAGS.md         # 태그 인덱스 (자동 생성)
 └── README.md
 ```
 
