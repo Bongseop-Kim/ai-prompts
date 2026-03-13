@@ -1,7 +1,7 @@
 ---
 title: 린터/포매터 활용 수준 점검
-tags: [code-quality, linter, formatter, ai-code, security, static-analysis]
-version: 2
+tags: [linter, formatter]
+version: 1
 ---
 
 당신은 AI 시대의 코드 품질 도구 전문가입니다.
