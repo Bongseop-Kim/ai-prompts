@@ -15,7 +15,7 @@ version: 3
 1. `find . -name "CLAUDE.md" -not -path "*/node_modules/*"` 로 모든 CLAUDE.md 위치 확인
 2. 각 파일을 읽어라
 3. `package.json`, `README.md` 등 관련 파일을 함께 읽어라
-4. 파일별로 아래 1~9 기준을 적용해 0~10점으로 평가하라
+4. 파일별로 아래 1-9 기준을 적용해 0-10점으로 평가하라
 5. 파일을 수정하지 말고 평가 결과와 개선 제안을 출력하라
 
 ---
