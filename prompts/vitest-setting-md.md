@@ -1,13 +1,12 @@
 ---
 title: Vitest 도입 수준 감사 프롬프트
 tags: [vitest, testing, code-quality]
-version: 1
+version: 2
 ---
 
-# Vitest 도입 수준 감사 프롬프트
-
-> Claude Code에서 실행하는 React 프로젝트 Vitest 도입 수준 자동 감사 프롬프트.
-> 점수(100점 만점) + 개선 항목 리스트를 출력한다.
+당신은 React 프로젝트 테스트 품질 전문가입니다.
+**지금 열려 있는 프로젝트의 Vitest 도입 수준을 직접 분석**하여 5개 영역에서 점검하고 개선 피드백을 제공하세요.
+**파일을 수정하지 않습니다.**
 
 ---
 
@@ -26,7 +25,7 @@ version: 1
 
 ## 공통 감점 규칙
 
-> **모든 항목에 적용**: 감점 적용 후 해당 항목 점수는 최소 0점으로 처리한다. 음수가 되지 않는다.
+감점 적용 후 해당 항목 점수는 최소 0점으로 처리한다. 음수가 되지 않는다.
 
 ---
 
@@ -42,13 +41,11 @@ version: 1
 | setupFiles | 5점 | `@testing-library/jest-dom` extend 포함 여부 |
 | coverage.provider | 4점 | `v8` 또는 `istanbul` 명시 여부 |
 | coverage.thresholds | 6점 | lines/branches/functions/statements 모두 80 이상 설정 여부 |
-| transform / plugin | 0점 (감점 항목) | `@vitejs/plugin-react` 또는 `transform` 설정 미존재 시 -3점 (React+TS 환경에서 테스트 실행 불가 신호) |
+| transform / plugin | 0점 (감점 항목) | `@vitejs/plugin-react` 또는 `transform` 설정 미존재 시 -3점 |
 
 감점 조건:
-- `globals: true` 미설정 시 -1점 (describe/it을 매 파일 import해야 해서 불편). 단, 팀 컨벤션상 명시적 import를 선호하는 경우 이 감점을 제외할 수 있다.
+- `globals: true` 미설정 시 -1점. 단, 팀 컨벤션상 명시적 import를 선호하는 경우 제외 가능
 - include/exclude 패턴 미설정 시 -1점
-
-> 근거: jsdom 없이는 React 컴포넌트 렌더링 자체가 불가능하다. coverage threshold를 설정하지 않으면 CI가 커버리지 하락을 감지하지 못한다. `@vitejs/plugin-react` 미설정 시 JSX 변환이 되지 않아 테스트 파일 자체가 parse 에러를 낸다. [^1]
 
 ---
 
@@ -61,13 +58,11 @@ version: 1
 | describe/it 계층 | 5점 | describe로 기능/컴포넌트 단위 그룹화, it은 단일 동작 검증 |
 | 테스트 네이밍 | 5점 | "동작을 설명하는 문장" 형식 (예: "버튼 클릭 시 모달이 열린다") |
 | 테스트 격리 | 5점 | beforeEach/afterEach에서 상태 초기화, 전역 오염 없음 |
-| 테스트 분포 | 5점 | Unit + Integration 테스트가 모두 존재하고, E2E만 있거나 단위 테스트만 있지 않음. 소스 파일 대비 테스트 파일 비율이 현저히 낮은 경우(예: 테스트 파일 1개 미만/소스 파일 10개) 최대 -3점 감점 |
+| 테스트 분포 | 5점 | Unit + Integration 테스트가 모두 존재하고, 소스 파일 대비 테스트 파일 비율이 현저히 낮은 경우(예: 테스트 파일 1개 미만/소스 파일 10개) 최대 -3점 감점 |
 
 감점 조건:
 - 테스트 파일이 전혀 없으면 이 항목 전체 0점
 - it 설명이 "test 1", "should work" 수준이면 네이밍 항목 0점
-
-> 근거: Testing Trophy 구조(Static → Unit → Integration → E2E)에 따르면 Integration 테스트 비중이 가장 높아야 ROI가 좋다. describe 계층 없이 평탄한 구조는 테스트 의도를 읽기 어렵게 만든다. [^2]
 
 ---
 
@@ -82,11 +77,9 @@ React Testing Library 사용 방식을 평가한다.
 | 비동기 처리 | 5점 | `waitFor`, `findBy*` 쿼리로 비동기 상태 검증 |
 | 커스텀 훅 테스트 | 5점 | `renderHook` 또는 래퍼 컴포넌트로 훅 단독 테스트 존재 여부 |
 
-감점 조건 (각 항목 최소 0점 보장):
+감점 조건:
 - 구현 세부사항 테스트 발견 시 (내부 state 직접 검증, 클래스명 단독 assertion) -2점/건, 최대 -6점
 - `screen` 대신 `container.querySelector` 남용 시 -2점
-
-> 근거: "The more your tests resemble the way your software is used, the more confidence they can give you." — RTL Guiding Principle. getByRole은 실제 접근성 트리를 기준으로 쿼리하므로 마크업 변경에 덜 취약하다. [^3]
 
 ---
 
@@ -101,11 +94,9 @@ React Testing Library 사용 방식을 평가한다.
 | mock 클린업 | 6점 | `afterEach`에서 `vi.clearAllMocks()` 또는 `vi.restoreAllMocks()` 호출 |
 | 과도한 mocking 없음 | 4점 | 테스트 대상 외 불필요한 모든 것을 mock하지 않음 |
 
-감점 조건 (각 항목 최소 0점 보장):
+감점 조건:
 - `vi.mock`을 쓰되 클린업 없이 테스트 간 mock 상태가 오염될 가능성 있으면 -3점
 - `jest.mock` 잔존 코드 발견 시 -2점 (Jest → Vitest 미완 마이그레이션 신호)
-
-> 근거: afterEach 클린업 없이 vi.mock을 사용하면 테스트 실행 순서에 따라 결과가 달라지는 flaky test가 발생한다. jest.mock 잔존은 일부 환경에서 런타임 오류를 유발한다. [^4]
 
 ---
 
@@ -119,8 +110,6 @@ React Testing Library 사용 방식을 평가한다.
 
 감점 조건:
 - threshold 설정은 있으나 CI에서 `--coverage` 플래그 없이 실행 시 -2점
-
-> 근거: 커버리지 80% 기준은 업계 표준으로 널리 인용된다. CI에서 `--coverage` 없이 실행하면 threshold가 있어도 기준점 미달을 감지하지 못한다. [^5]
 
 ---
 
@@ -197,7 +186,7 @@ React Testing Library 사용 방식을 평가한다.
 - 파일을 수정하지 말 것
 - 각 판단은 파일의 실제 내용을 인용해서 구체적으로 근거를 제시할 것
 - `package.json`, `vitest.config.ts` 등 관련 파일을 참조해서 stale 여부를 검증할 것
-- 점수는 항목별 설명의 가점/감점 기준을 엄격히 적용할 것. 관대하게 주지 말 것
+- 점수는 항목별 가점/감점 기준을 엄격히 적용할 것. 관대하게 주지 말 것
 - 감점 적용 후 각 항목 점수는 최소 0점이며 음수가 되지 않는다
 
 ---
